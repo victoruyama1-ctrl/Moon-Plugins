@@ -231,7 +231,7 @@ export default function LibraryPlugin({ host }: { host: LibraryHost }) {
 
         {visibleAssets.length > 0 ? (
           <div className="mt-1 min-h-0 flex-1 overflow-y-auto pr-1 scrollbar-none [&::-webkit-scrollbar]:hidden">
-            <div style={{ gridTemplateColumns: "repeat(7, minmax(0, 1fr))" }} className="grid gap-x-1 gap-y-2 pb-4">
+            <div style={{ gridTemplateColumns: "repeat(7, minmax(0, 1fr))" }} className="library-asset-grid grid gap-x-1 gap-y-2 pb-4">
               {visibleAssets.map((asset) => (
                 <AssetCard
                   key={asset.id}
@@ -376,3 +376,4 @@ function AssetCard({ asset, editingId, editingName, setEditingName, beginRename,
     </article>
   );
 }
+
