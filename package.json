@@ -1,0 +1,17 @@
+{
+  "name": "moon-library-plugin",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "@types/react": "^18.3.12",
+    "@types/node": "^22.10.2"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1"
+  }
+}

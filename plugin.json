@@ -1,0 +1,13 @@
+{
+  "id": "moon.library",
+  "name": "Library",
+  "version": "1.0.0",
+  "entry": "src/Library.tsx",
+  "backend": "convex/files.ts",
+  "permissions": ["library.upload", "library.delete"],
+  "capabilities": ["workspace-storage", "workspace-assets"],
+  "supportedMimeTypes": ["image/*", "application/pdf"],
+  "limits": {
+    "maxFileBytes": 26214400
+  }
+}
