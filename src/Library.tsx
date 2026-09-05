@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, type ChangeEvent, type KeyboardEvent } from "react";
-import { FileText, Pencil, Search, Sparkles, Trash2, Upload, X } from "lucide-react";
+import { Check, FileText, Pencil, Search, Sparkles, Trash2, Upload, X } from "lucide-react";
 import type { LibraryAsset, LibraryHost } from "./host";
-import CyberLoading from "../../../src/components/Home/loading";
+import Moon3D from "../../../../src/components/Home/Moon3D";
 
 const MAX_FILE_BYTES = 25 * 1024 * 1024;
 
@@ -25,6 +25,8 @@ export default function LibraryPlugin({ host }: { host: LibraryHost }) {
   const [search, setSearch] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ completed: 0, total: 0 });
+  const [fileOperation, setFileOperation] = useState<string | null>(null);
+  const [fileOperationProgress, setFileOperationProgress] = useState(0);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
   const [selectedAssetIds, setSelectedAssetIds] = useState<string[]>([]);
@@ -67,16 +69,27 @@ export default function LibraryPlugin({ host }: { host: LibraryHost }) {
         if (!response.ok) throw new Error(`Upload failed for ${file.name}.`);
 
         const result = (await response.json()) as { storageId: string };
-        await host.createAsset({
+        const createdId = await host.createAsset({
           storageId: result.storageId,
           originalName: file.name,
           mimeType: file.type,
           size: file.size,
         });
+        setAssets((current) => [
+          {
+            id: createdId,
+            name: file.name,
+            mimeType: file.type === "application/pdf" ? "pdf" : "image",
+            size: file.size,
+            createdAt: Date.now(),
+            url: file.type.startsWith("image/") ? URL.createObjectURL(file) : null,
+            canDelete: true,
+          },
+          ...current,
+        ]);
         setUploadProgress({ completed: index + 1, total: selected.length });
       }
 
-      await loadAssets();
       host.notify(`${selected.length} file${selected.length === 1 ? "" : "s"} added to the library.`);
     } catch (error) {
       host.notify(
@@ -100,12 +113,19 @@ export default function LibraryPlugin({ host }: { host: LibraryHost }) {
     setEditingId(null);
     if (!name) return;
 
+    setFileOperation("Renaming file");
+    setFileOperationProgress(35);
+    await new Promise((resolve) => window.setTimeout(resolve, 250));
     try {
       await host.renameAsset(editingId, name);
-      await loadAssets();
+      setFileOperationProgress(100);
+      setAssets((current) => current.map((asset) => asset.id === editingId ? { ...asset, name } : asset));
       host.notify("File name updated.");
     } catch (error) {
       host.notify(error instanceof Error ? error.message : "Unable to rename the file.", "error");
+    } finally {
+      setFileOperation(null);
+      setFileOperationProgress(0);
     }
   };
 
@@ -115,25 +135,46 @@ export default function LibraryPlugin({ host }: { host: LibraryHost }) {
   };
 
   const remove = async (asset: LibraryAsset) => {
+    setFileOperation("Deleting file");
+    setFileOperationProgress(35);
+    await new Promise((resolve) => window.setTimeout(resolve, 250));
     try {
       await host.deleteAsset(asset.id);
-      await loadAssets();
+      setFileOperationProgress(100);
+      setAssets((current) => current.filter((currentAsset) => currentAsset.id !== asset.id));
       host.notify("File deleted from the library.");
     } catch (error) {
       host.notify(error instanceof Error ? error.message : "Unable to delete the file.", "error");
+    } finally {
+      setFileOperation(null);
+      setFileOperationProgress(0);
     }
     setDeleteTarget(null);
   };
 
   const removeSelected = async () => {
-    if (selectedAssetIds.length === 0) return;
+    const existingSelectedIds = selectedAssetIds.filter((id) =>
+      assets.some((asset) => asset.id === id),
+    );
+    if (existingSelectedIds.length === 0) {
+      setSelectedAssetIds([]);
+      setBulkDeleteOpen(false);
+      return;
+    }
+    setFileOperation("Deleting selected files");
+    setFileOperationProgress(35);
+    await new Promise((resolve) => window.setTimeout(resolve, 250));
     try {
-      await host.deleteAssets(selectedAssetIds);
-      await loadAssets();
-      host.notify(`${selectedAssetIds.length} file${selectedAssetIds.length === 1 ? "" : "s"} deleted from the library.`);
+      await host.deleteAssets(existingSelectedIds);
+      setFileOperationProgress(100);
+      setAssets((current) => current.filter((asset) => !existingSelectedIds.includes(asset.id)));
+      host.notify(`${existingSelectedIds.length} file${existingSelectedIds.length === 1 ? "" : "s"} deleted from the library.`);
       setSelectedAssetIds([]);
     } catch (error) {
       host.notify(error instanceof Error ? error.message : "Unable to delete the selected files.", "error");
+    } finally {
+      setFileOperation(null);
+      setFileOperationProgress(0);
     }
     setBulkDeleteOpen(false);
   };
@@ -141,14 +182,16 @@ export default function LibraryPlugin({ host }: { host: LibraryHost }) {
   const visibleAssets = assets.filter((asset) =>
     asset.name.toLowerCase().includes(search.trim().toLowerCase()),
   );
+  const deletableAssetIds = assets.filter((asset) => asset.canDelete).map((asset) => asset.id);
+  const allAssetsSelected = deletableAssetIds.length > 0 && deletableAssetIds.every((id) => selectedAssetIds.includes(id));
   const totalSize = assets.reduce((total, asset) => total + asset.size, 0);
 
   return (
     <section className="h-full overflow-hidden bg-[#030711] px-5 py-5 text-slate-100 sm:px-8 lg:px-9">
-      <CyberLoading
-        visible={uploading}
-        message={`Uploading files ${Math.min(uploadProgress.completed + 1, uploadProgress.total)} of ${uploadProgress.total}`}
-        progress={uploadProgress.total ? (uploadProgress.completed / uploadProgress.total) * 100 : 0}
+      <LibraryLoading
+        visible={uploading || fileOperation !== null}
+        message={fileOperation ?? `Uploading files ${Math.min(uploadProgress.completed + 1, uploadProgress.total)} of ${uploadProgress.total}`}
+        progress={fileOperation !== null ? fileOperationProgress : uploadProgress.total ? (uploadProgress.completed / uploadProgress.total) * 100 : 0}
       />
       <div className="mx-auto flex h-full max-w-7xl flex-col">
         <div className="relative shrink-0 overflow-hidden px-4 py-1 sm:px-6">
@@ -160,9 +203,14 @@ export default function LibraryPlugin({ host }: { host: LibraryHost }) {
             </div>
             <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
               {selectedAssetIds.length > 0 && (
-                <button type="button" onClick={() => setBulkDeleteOpen(true)} className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-semibold transition hover:bg-red-400/30" style={{ border: "1px solid rgba(248, 113, 113, 0.55)", backgroundColor: "rgba(248, 113, 113, 0.2)", color: "#fee2e2" }}>
-                  <Trash2 className="h-3 w-3" /> Delete all selected ({selectedAssetIds.length})
-                </button>
+                <>
+                  <button type="button" onClick={() => setSelectedAssetIds(allAssetsSelected ? [] : deletableAssetIds)} className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-semibold transition hover:bg-cyan-300/20" style={{ border: "1px solid rgba(103, 232, 249, 0.45)", backgroundColor: "rgba(103, 232, 249, 0.12)", color: "#cffafe" }}>
+                    <Check className="h-3 w-3" /> {allAssetsSelected ? "Uncheck all" : "Check all"}
+                  </button>
+                  <button type="button" onClick={() => setBulkDeleteOpen(true)} className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-semibold transition hover:bg-red-400/30" style={{ border: "1px solid rgba(248, 113, 113, 0.55)", backgroundColor: "rgba(248, 113, 113, 0.2)", color: "#fee2e2" }}>
+                    <Trash2 className="h-3 w-3" /> Delete all selected ({selectedAssetIds.length})
+                  </button>
+                </>
               )}
               <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-cyan-300/50 bg-cyan-300/10 px-2.5 py-1.5 text-[11px] font-semibold text-cyan-100">
                 <Upload className="h-3 w-3" />
@@ -258,6 +306,33 @@ function DeleteDialog({
           <button type="button" onClick={onCancel} className="rounded-lg px-4 py-2 text-xs text-slate-200 transition hover:bg-white/10" style={{ border: "1px solid rgba(148, 163, 184, 0.3)", backgroundColor: "rgba(148, 163, 184, 0.08)" }}>Cancel</button>
           <button type="button" onClick={onConfirm} className="rounded-lg px-4 py-2 text-xs font-semibold text-red-50 transition hover:bg-red-400/30" style={{ border: "1px solid rgba(248, 113, 113, 0.55)", backgroundColor: "rgba(248, 113, 113, 0.2)" }}>Delete permanently</button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function LibraryLoading({
+  visible,
+  message,
+  progress,
+}: {
+  visible: boolean;
+  message: string;
+  progress: number;
+}) {
+  if (!visible) return null;
+  return (
+    <div className="fixed inset-0 flex h-screen w-screen items-center justify-center bg-slate-950/80 px-5 backdrop-blur-md" style={{ zIndex: 2147483647 }}>
+      <div className="relative flex flex-col items-center justify-center">
+        <div className="absolute h-28 w-28 rounded-full border border-cyan-400/30 bg-cyan-500/5 shadow-[0_0_30px_rgba(34,211,238,0.25)] blur-md" />
+        <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-slate-900/80 shadow-[0_0_28px_rgba(34,211,238,0.35)]" style={{ background: `conic-gradient(rgb(103 232 249) ${Math.min(100, Math.max(0, progress))}%, rgba(103, 232, 249, 0.14) 0)` }}>
+          <div className="absolute inset-1.5 rounded-full bg-slate-900/95" />
+          <div className="absolute inset-5 rounded-full border border-cyan-500/30" />
+          <div className="relative z-10 flex h-8 w-8 items-center justify-center">
+            <Moon3D />
+          </div>
+        </div>
+        <p className="mt-5 text-center text-[10px] font-semibold uppercase tracking-[0.35em] text-cyan-300/80">{message}</p>
       </div>
     </div>
   );
