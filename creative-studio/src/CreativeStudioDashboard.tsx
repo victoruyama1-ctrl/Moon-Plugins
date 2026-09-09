@@ -43,7 +43,7 @@ export default function CreativeStudioDashboard() {
   const [deletingProjectId, setDeletingProjectId] = useState<Id<"creativeProjects"> | null>(null);
   const hoverSoundPending = useRef(false);
   const projectScrollerRef = useRef<HTMLDivElement>(null);
-  const projectDragRef = useRef<{ startX: number; startScrollLeft: number; moved: boolean } | null>(null);
+  const projectDragRef = useRef<{ startX: number; startScrollLeft: number; moved: boolean; pointerId: number } | null>(null);
   const suppressProjectClickRef = useRef(false);
   const workspaces = useQuery(api.workspaces.listForUser, username ? { username } : "skip");
   const projects = useQuery(api.creativeProjects.listForWorkspace, username && workspaceId ? { username, workspaceId } : "skip") as Project[] | undefined;
@@ -98,14 +98,16 @@ export default function CreativeStudioDashboard() {
   const startProjectDrag = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
     if ((event.target as HTMLElement).closest('[aria-label^="Delete "]')) return;
-    projectDragRef.current = { startX: event.clientX, startScrollLeft: event.currentTarget.scrollLeft, moved: false };
-    event.currentTarget.setPointerCapture(event.pointerId);
+    projectDragRef.current = { startX: event.clientX, startScrollLeft: event.currentTarget.scrollLeft, moved: false, pointerId: event.pointerId };
   };
   const moveProjectDrag = (event: React.PointerEvent<HTMLDivElement>) => {
     const drag = projectDragRef.current;
     if (!drag) return;
     const distance = event.clientX - drag.startX;
-    if (Math.abs(distance) > 4) drag.moved = true;
+    if (Math.abs(distance) > 4) {
+      drag.moved = true;
+      if (!event.currentTarget.hasPointerCapture(drag.pointerId)) event.currentTarget.setPointerCapture(drag.pointerId);
+    }
     event.currentTarget.scrollLeft = drag.startScrollLeft - distance;
   };
   const stopProjectDrag = (event: React.PointerEvent<HTMLDivElement>) => {
