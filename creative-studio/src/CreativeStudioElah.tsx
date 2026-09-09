@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, type MutableRefObject } from "react";
-import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
 import {
   EditorProvider,
@@ -26,6 +25,7 @@ import { exportVideo } from "@elah/editor";
 import type { TimelineRef } from "@elah/timeline";
 import type { Id } from "@moon/convex-data-model";
 import { api } from "@moon/convex-api";
+import { navigate } from "./navigation";
 
 // Token defaults + compiled component styles
 import "@elah/editor/styles/tokens.css";
@@ -282,7 +282,7 @@ function StudioAtmosphere() {
 
 function EditorToolbar({ projectName }: { projectName?: string }) {
   const { engine } = useEditor();
-  const router = useRouter();
+  const router = { push: navigate };
   const [exporting, setExporting] = useState(false);
 
   const exportProject = async () => {

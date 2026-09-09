@@ -2,11 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
-import { useRouter } from "next/navigation";
 import { AudioLines, Bot, Film, Image as ImageIcon, Layers3, Plus, Search, Sparkles, Trash2, X } from "lucide-react";
 import { api } from "@moon/convex-api";
 import type { Id } from "@moon/convex-data-model";
 import { playStudioSound } from "./studio-interactions";
+import { navigate } from "./navigation";
 
 type ProjectType = "video" | "image" | "audio" | "design";
 type Project = { _id: Id<"creativeProjects">; name: string; type: ProjectType; width: number; height: number; updatedAt: number; previewUrl?: string; previewType?: "image" | "video" };
@@ -32,7 +32,6 @@ const recentArtwork = [
 const formatDate = (timestamp: number) => new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(timestamp);
 
 export default function CreativeStudioDashboard() {
-  const router = useRouter();
   const [username, setUsername] = useState<string | null>(null);
   const [workspaceId, setWorkspaceId] = useState<Id<"workspaces"> | null>(null);
   const [search, setSearch] = useState("");
@@ -77,7 +76,7 @@ export default function CreativeStudioDashboard() {
   const submitProject = async (type = selectedType) => {
     if (!username || !workspaceId || !projectName.trim()) return;
     setCreating(true); setError(null);
-    try { const projectId = await createProject({ username, workspaceId, name: projectName, type, ...projectDefaults[type] }); setNewProjectOpen(false); setProjectName("Untitled project"); router.push(`/creative?project=${projectId}`); }
+    try { const projectId = await createProject({ username, workspaceId, name: projectName, type, ...projectDefaults[type] }); setNewProjectOpen(false); setProjectName("Untitled project"); navigate(`/creative?project=${projectId}`); }
     catch (createError) { setError(createError instanceof Error ? createError.message : "Could not create the project."); }
     finally { setCreating(false); }
   };
@@ -123,7 +122,7 @@ export default function CreativeStudioDashboard() {
       return;
     }
     playClickSound();
-    router.push(`/creative?project=${project._id}`);
+    navigate(`/creative?project=${project._id}`);
   };
 
   return (
