@@ -569,8 +569,7 @@ function CreativeSourcePanel({ projectId, username }: { projectId?: string; user
   const uploadFiles = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? []);
     event.target.value = "";
-    await importFiles(files);
-    if (!projectId) return;
+    if (files.length === 0 || !projectId) return;
     const cacheKey = `moon-creative-local:${projectId}`;
     const cachedState = JSON.parse(localStorage.getItem(cacheKey) ?? "{}");
     const cachedAssets = (cachedState.assets ?? []).map((asset: { src?: string; [key: string]: unknown }) => ({
@@ -587,6 +586,11 @@ function CreativeSourcePanel({ projectId, username }: { projectId?: string; user
     uploadEvents.forEach(({ file, cacheId }) => {
       window.dispatchEvent(new CustomEvent("moon:upload-creative-asset", { detail: { file, cacheId } }));
     });
+    try {
+      await importFiles(files);
+    } catch (error) {
+      console.error("Could not import media into the editor", error);
+    }
   };
 
   const deleteAsset = async (asset: (typeof assets)[number]) => {
