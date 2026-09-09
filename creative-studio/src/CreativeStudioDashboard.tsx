@@ -139,7 +139,7 @@ export default function CreativeStudioDashboard() {
           </div>
         </header>
 
-        <div className="relative z-10 mt-5 grid grid-cols-4 gap-2.5 sm:grid-cols-3 lg:grid-cols-5 lg:gap-3">
+        <div className="relative z-10 mt-5 grid gap-2.5 lg:gap-3" style={{ gridTemplateColumns: "repeat(5, minmax(0, 1fr))" }}>
           {categories.map(({ type, label, description, icon: Icon, iconTone, image }, index) => <button key={type} type="button" onMouseEnter={playHoverSound} onClick={() => { playClickSound(); openNewProject(type); }} className="creative-mode-card group text-left" style={{ animationDelay: `${index * 55}ms` }}><span className={`creative-mode-icon ${iconTone}`}><Icon className="h-4 w-4" /></span><span className="mt-2 block text-[12px] font-semibold">{label}</span><span className="mt-1 block min-h-7 text-[8px] leading-3 text-slate-400">{description}</span><span className="creative-mode-art" aria-hidden="true"><img src={image} alt="" /></span></button>)}
           <button type="button" onMouseEnter={playHoverSound} onClick={() => { playClickSound(); openNewProject("design"); }} className="creative-mode-card group text-left" style={{ animationDelay: "220ms" }}><span className={`creative-mode-icon ${aiCategory.iconTone}`}><Bot className="h-4 w-4" /></span><span className="mt-2 block text-[12px] font-semibold">{aiCategory.label}</span><span className="mt-1 block min-h-7 text-[8px] leading-3 text-slate-400">{aiCategory.description}</span><span className="creative-mode-art" aria-hidden="true"><img src={aiCategory.image} alt="" /></span></button>
         </div>
