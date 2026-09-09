@@ -509,7 +509,7 @@ function PropertiesPanel() {
     <aside className="creative-properties-panel flex h-full w-[300px] shrink-0 flex-col overflow-hidden border-l border-[#273044] bg-[#101620] text-slate-200">
       <div className="border-b border-[#273044] px-4 pb-3 pt-4">
         <h2 className="text-sm font-semibold text-white">Properties</h2>
-        <p className="mt-2 min-h-8 break-words font-mono text-[10px] leading-4 text-slate-400">{selectedClip ? `${selectedClip.name}  ·  ${selectedClip.type}  ·  ${formatTimecode(selectedClip.startFrame, 30)}-${formatTimecode(selectedClip.startFrame + selectedClip.durationFrames, 30)}` : "Select a clip to edit properties"}</p>
+        <p className="mt-2 min-h-8 wrap-break-word font-mono text-[10px] leading-4 text-slate-400">{selectedClip ? `${selectedClip.name}  ·  ${selectedClip.type}  ·  ${formatTimecode(selectedClip.startFrame, 30)}-${formatTimecode(selectedClip.startFrame + selectedClip.durationFrames, 30)}` : "Select a clip to edit properties"}</p>
       </div>
       {selectedClip?.type === "audio" ? <AudioProperties clip={selectedClip} track={track} /> : selectedClip ? <VisualProperties clip={selectedClip} transform={transform} /> : <p className="p-4 text-center text-xs text-slate-500">Select a clip to edit properties</p>}
     </aside>

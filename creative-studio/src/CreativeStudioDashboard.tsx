@@ -10,6 +10,7 @@ import { navigate } from "./navigation";
 
 type ProjectType = "video" | "image" | "audio" | "design";
 type Project = { _id: Id<"creativeProjects">; name: string; type: ProjectType; width: number; height: number; updatedAt: number; previewUrl?: string; previewType?: "image" | "video" };
+type CloudinaryAsset = { publicId: string; resourceType: string };
 
 type Category = { type: ProjectType; label: string; description: string; icon: typeof Film; iconTone: string; image: string };
 
@@ -86,7 +87,7 @@ export default function CreativeStudioDashboard() {
     setDeletingProjectId(project._id);
     try {
       playClickSound();
-      const cloudinaryAssets = await removeProject({ username, projectId: project._id });
+      const cloudinaryAssets = await removeProject({ username, projectId: project._id }) as CloudinaryAsset[];
       localStorage.removeItem(`moon-creative-local:${project._id}`);
       await Promise.allSettled(cloudinaryAssets.map((asset) => fetch("/api/media/delete", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(asset) })));
     } catch (deleteError) {
