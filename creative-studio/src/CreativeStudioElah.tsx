@@ -31,6 +31,7 @@ import { navigate } from "./navigation";
 import "@elah/editor/styles/tokens.css";
 import "@elah/timeline/styles.css";
 import "@elah/editor/styles.css";
+import "./CreativeStudioElah.module.css";
 
 interface CreativeStudioElahProps {
   projectId?: Id<"creativeProjects"> | string;

@@ -1,0 +1,17 @@
+.elah-root {
+  min-height: 0;
+  color: #e2e8f0;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.elah-root .creative-source-scroll { min-height: 0; overflow-y: auto; scrollbar-width: none; }
+.elah-root .creative-source-scroll::-webkit-scrollbar { display: none; }
+.elah-root .creative-source-scroll > .group { position: relative; display: flex; min-width: 0; height: 124px; }
+.elah-root .creative-source-scroll > .group > button:first-child { display: flex; width: 100%; min-width: 0; height: 100%; flex-direction: column; cursor: grab; text-align: left; }
+.elah-root .creative-source-scroll > .group > button:first-child > span:first-child { position: relative; display: block; height: 88px; flex-shrink: 0; overflow: hidden; border: 1px solid #2d3a52; border-radius: 6px; background: #080c13; }
+.elah-root .creative-source-scroll > .group > button:first-child > span:first-child img { width: 100%; height: 100%; object-fit: cover; }
+.elah-root .creative-source-scroll > .group > button:last-child { position: absolute; top: 4px; right: 4px; z-index: 2; padding: 4px; border: 0; border-radius: 4px; color: white; background: rgba(244, 63, 94, 0.85); opacity: 0; }
+.elah-root .creative-source-scroll > .group:hover > button:last-child, .elah-root .creative-source-scroll > .group > button:last-child:focus-visible { opacity: 1; }
+.elah-root .creative-properties-panel { min-height: 0; }
+.elah-root .creative-properties-panel .overflow-y-auto { min-height: 0; overflow-y: auto; scrollbar-width: none; }
+.elah-root .creative-properties-panel .overflow-y-auto::-webkit-scrollbar { display: none; }
