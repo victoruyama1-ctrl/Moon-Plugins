@@ -6,7 +6,7 @@
 
 .elah-root .creative-editor-map-background { position: absolute !important; inset: 0 !important; z-index: 0 !important; width: 100% !important; height: 100% !important; object-fit: cover; pointer-events: none; opacity: 0.2; filter: saturate(0.8) contrast(1.1); }
 
-.elah-root .creative-source-scroll { min-height: 0; overflow-y: auto; scrollbar-width: none; }
+.elah-root .creative-source-scroll { min-height: 0; overflow-y: auto; }
 .elah-root .creative-source-scroll::-webkit-scrollbar { display: none; }
 .elah-root .creative-source-scroll > .group { position: relative; display: flex; min-width: 0; height: 124px; }
 .elah-root .creative-source-scroll > .group > button:first-child { display: flex; width: 100%; min-width: 0; height: 100%; flex-direction: column; cursor: grab; text-align: left; }
@@ -15,5 +15,5 @@
 .elah-root .creative-source-scroll > .group > button:last-child { position: absolute; top: 4px; right: 4px; z-index: 2; padding: 4px; border: 0; border-radius: 4px; color: white; background: rgba(244, 63, 94, 0.85); opacity: 0; }
 .elah-root .creative-source-scroll > .group:hover > button:last-child, .elah-root .creative-source-scroll > .group > button:last-child:focus-visible { opacity: 1; }
 .elah-root .creative-properties-panel { min-height: 0; }
-.elah-root .creative-properties-panel .overflow-y-auto { min-height: 0; overflow-y: auto; scrollbar-width: none; }
+.elah-root .creative-properties-panel .overflow-y-auto { min-height: 0; overflow-y: auto; }
 .elah-root .creative-properties-panel .overflow-y-auto::-webkit-scrollbar { display: none; }
