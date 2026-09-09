@@ -110,6 +110,7 @@ export default function CreativeStudioElah({ projectId }: CreativeStudioElahProp
         className="elah-root h-full min-h-0 w-full min-w-0 overflow-hidden"
         style={{ display: "flex", flexDirection: "column" }}
       >
+        <video className="creative-editor-map-background" src="/videos/map.mp4" autoPlay loop muted playsInline aria-hidden="true" />
         <div className="studio-cursor-orb" aria-hidden="true" />
         <EditorToolbar projectName={project?.name} />
         <div style={{ display: "flex", flex: 1, minHeight: 0 }}>

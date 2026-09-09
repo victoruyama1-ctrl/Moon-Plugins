@@ -4,6 +4,22 @@
   font-family: ui-sans-serif, system-ui, sans-serif;
 }
 
+.elah-root .creative-editor-map-background {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  pointer-events: none;
+  opacity: 0.2;
+  filter: saturate(0.8) contrast(1.1);
+}
+
+.elah-root .creative-editor-map-background::after {
+  content: "";
+}
+
 .elah-root .creative-source-scroll { min-height: 0; overflow-y: auto; scrollbar-width: none; }
 .elah-root .creative-source-scroll::-webkit-scrollbar { display: none; }
 .elah-root .creative-source-scroll > .group { position: relative; display: flex; min-width: 0; height: 124px; }
