@@ -1,0 +1,11 @@
+/**
+ * Elah Editor Styles
+ * 
+ * These styles are scoped to the Creative Studio component only.
+ * They must be imported inside CreativeStudioElah.tsx to avoid
+ * affecting the rest of the Moon application.
+ */
+
+@import "@elah/timeline/styles.css";
+@import "@elah/editor/styles.css";
+@import "@elah/editor/styles/tokens.css";

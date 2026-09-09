@@ -1,0 +1,12 @@
+{
+  "id": "moon.creative-studio",
+  "name": "Creative Studio",
+  "version": "1.0.0",
+  "entry": "src/CreativeStudio.tsx",
+  "permissions": ["creative.projects.read", "creative.projects.write", "creative.media.upload"],
+  "capabilities": ["creative-editor", "workspace-media", "workspace-projects"],
+  "supportedMimeTypes": ["video/*", "audio/*", "image/*"],
+  "limits": {
+    "maxFileBytes": 104857600
+  }
+}
